@@ -43,6 +43,8 @@ function Uncanny:update(dt)
 
   local rect = world.clientWindow()
   local ePos = entity.position()
+  rect[1] = world.nearestTo(ePos[1], rect[1])
+  rect[3] = world.nearestTo(ePos[1], rect[3])
   local xMin = rect[1] - ePos[1]
   local yMin = rect[2] - ePos[2]
   local xMax = rect[3] - ePos[1] - (phase.size[1] * d.scale)
