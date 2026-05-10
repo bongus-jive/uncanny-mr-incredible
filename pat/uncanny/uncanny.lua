@@ -28,8 +28,7 @@ function Uncanny:init()
 
   self.drawable = {
     fullbright = true,
-    centered = false,
-    position = {0, 0}
+    centered = false
   }
 end
 
@@ -55,6 +54,11 @@ function Uncanny:update(dt)
   
   local diag = math.sqrt((xMax - xMin) ^ 2 + (yMax - yMin) ^ 2)
   local speed = diag / self.speed * dt
+
+  if not d.position then
+    local r = sb.makeRandomSource()
+    d.position = { r:randf(xMin, xMax), r:randf(yMin, yMax) }
+  end
   
   local pos = d.position
   pos[1], dir.x = self:move(pos[1], speed, xMin, xMax, dir.x)
