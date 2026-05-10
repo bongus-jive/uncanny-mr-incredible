@@ -9,7 +9,6 @@ function Uncanny:init()
     phase.size = root.imageSize(phase.image)
     phase.size[1] = phase.size[1] / 8
     phase.size[2] = phase.size[2] / 8
-    phase.area = phase.size[1] * phase.size[2]
     self.phases[#self.phases + 1] = phase
   end
   table.sort(self.phases, function(a, b) return a.sort < b.sort end)
