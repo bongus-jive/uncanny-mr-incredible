@@ -17,9 +17,11 @@ function Uncanny:init()
   self.phaseTimer = 0
   self.phaseCount = #self.phases - 1
   self.speed = cfg.speed
-  self.scaleMin = cfg.scaleMin
-  self.scaleMax = cfg.scaleMax
+
+  self.scaleMin = cfg.scaleMin * cfg.screenScale
+  self.scaleMax = cfg.scaleMax * cfg.screenScale
   self.scaleSpeed = (self.scaleMax - self.scaleMin) / self.speed
+  self.scale = (self.scaleMin + self.scaleMax) / 2
 
   local r = sb.makeRandomSource()
   self.directions = { x = r:randb(), y = r:randb(), z = r:randb() }
@@ -27,7 +29,6 @@ function Uncanny:init()
   self.drawable = {
     fullbright = true,
     centered = false,
-    scale = (self.scaleMin + self.scaleMax) / 2,
     position = {0, 0}
   }
 end
@@ -36,22 +37,24 @@ function Uncanny:update(dt)
   self.phaseTimer = math.max(0, self.phaseTimer - dt)
   local phase = self:getPhase()
 
-  local d = self.drawable
-  local dir = self.directions
-  d.image = phase.image
-  d.scale, dir.z = self:move(d.scale, self.scaleSpeed * dt, self.scaleMin, self.scaleMax, dir.z)
-
   local rect = world.clientWindow()
   local ePos = entity.position()
   rect[1] = world.nearestTo(ePos[1], rect[1])
   rect[3] = world.nearestTo(ePos[1], rect[3])
+
+  local d = self.drawable
+  local dir = self.directions
+  self.scale, dir.z = self:move(self.scale, self.scaleSpeed * dt, self.scaleMin, self.scaleMax, dir.z)
+  d.image = phase.image
+  d.scale = self.scale * ((rect[3] - rect[1]) / phase.size[1])
+
   local xMin = rect[1] - ePos[1]
   local yMin = rect[2] - ePos[2]
   local xMax = rect[3] - ePos[1] - (phase.size[1] * d.scale)
   local yMax = rect[4] - ePos[2] - (phase.size[2] * d.scale)
   
   local diag = math.sqrt((xMax - xMin) ^ 2 + (yMax - yMin) ^ 2)
-  local speed = diag / self.speed * dt * d.scale
+  local speed = diag / self.speed * dt
   
   local pos = d.position
   pos[1], dir.x = self:move(pos[1], speed, xMin, xMax, dir.x)
